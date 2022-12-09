@@ -9,7 +9,7 @@ import org.alitouka.spark.dbscan.spatial.Point
 /** Contains functions for reading and writing data
   *
   */
-object IOHelper {
+object IOHelper extends Serializable {
 
   /** Reads a dataset from a CSV file. That file should contain double values separated by commas
     *
@@ -47,6 +47,6 @@ object IOHelper {
     data.map ( x => x._1 + separator + x._2 + separator + x._3 ).saveAsTextFile(outputPath)
   }
 
-  private def separator = ","
+  private def separator = " "
 
 }

@@ -9,7 +9,7 @@ import org.alitouka.spark.dbscan.util.math.DoubleComparisonOperations._
   * @param boxId A unique identifier of this box
   * @param partitionId Identifier of a data set partition which corresponds to this box
   */
-private [dbscan] class Box (val bounds: Array[BoundsInOneDimension], val boxId: BoxId = 0, val partitionId: Int = -1, var adjacentBoxes: List[Box] = Nil)
+private [dbscan] class Box (val bounds: Array[BoundsInOneDimension], val boxId: BoxId = 0, val partitionId: Int = -1, @transient var adjacentBoxes: List[Box] = Nil)
   extends Serializable with Ordered[Box] {
 
   val centerPoint = calculateCenter (bounds)

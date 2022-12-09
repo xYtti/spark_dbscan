@@ -33,6 +33,7 @@ object DbscanDriver {
 
 
   def main (args: Array[String]): Unit = {
+    val t1 = System.currentTimeMillis()
 
     val argsParser = new ArgsParser ()
 
@@ -43,7 +44,7 @@ object DbscanDriver {
 
       val conf = new SparkConf()
         .setMaster(argsParser.args.masterUrl)
-        .setAppName("DBSCAN")
+        .setAppName("alitouka DBSCAN")
         .setJars(Array(argsParser.args.jar))
 
       if (argsParser.args.debugOutputPath.isDefined) {
@@ -53,7 +54,13 @@ object DbscanDriver {
 
       val sc = new SparkContext(conf)
 
-      val data = IOHelper.readDataset(sc, argsParser.args.inputPath)
+      println("\n--------start--------\n")
+      println("* start:             " + t1)
+      val data = IOHelper.readDataset(sc, argsParser.args.inputPath).cache()
+      println("trainData: " + data.count())
+      val t2 = System.currentTimeMillis()
+      println("* after preprocess:  " + t2)
+
       val settings = new DbscanSettings ()
         .withEpsilon(argsParser.args.eps)
         .withNumberOfPoints(argsParser.args.minPts)
@@ -64,8 +71,19 @@ object DbscanDriver {
 
       val clusteringResult = Dbscan.train(data, settings, partitioningSettings)
       IOHelper.saveClusteringResult(clusteringResult, argsParser.args.outputPath)
+      val t3 = System.currentTimeMillis()
+      println("* after train:       " + t3)
 
       clock.logTimeSinceStart("Clustering")
+
+      println("\n--------success--------\n")
+
+      val trainingProcess = (t3 - t1).toDouble / 1000
+      val trainingStep = (t3 - t2).toDouble / 1000
+      val dataProcess = (t2 - t1).toDouble / 1000
+      println("[s]train total:     " + trainingProcess)
+      println("[s]data preprocess: " + dataProcess)
+      println("[s]train:           " + trainingStep)
     }
   }
 }
